@@ -84,7 +84,7 @@ module IVPutils
   """
     IVP_solver(ivp_params)
 
-  Solve the initial value problem (IVP) given the
+  Solves an initial value problem (IVP) given the
   ivp_params (of type IVPSolverParams).
 
   The IVP is of the form:
