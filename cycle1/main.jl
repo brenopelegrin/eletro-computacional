@@ -17,53 +17,45 @@ Authors:
 """
 module cycle1
   include("./ivputils.jl")
+  include("./rlcutils.jl")
   using Printf
+  using Plots
   import .IVPutils
+  import .RLCUtils
 
   function main()
 
     # Defines the float type to use as Float64, for better precision
     type = Float64
+    step::type = 1e-4
 
-    # Defines the IVP function, of the form y' = f(x,y), with y(t0) = y0
-    # This is a function used only for testing. It isn't the RLC circuit function.
-    function func(t, y)
-      return t * y
-    end
-
-    # Defines the initial parameters for each numerical method
-    euler_params = IVPutils.IVPSolverParams{type}(
-      func,                   # f
-      0.0,                    # t0
-      1.0,                    # tf
-      1.0,                    # y0
-      0.2,                    # h
-      type,                   # type
-      IVPutils.euler_method   # method
-    )
-    rk4_params = IVPutils.IVPSolverParams{type}(
-      func,                   # f
-      0.0,                    # t0
-      1.0,                    # tf
-      1.0,                    # y0
-      0.2,                    # h
-      type,                   # type
-      IVPutils.rk4_method     # method
+    wave_params = RLCUtils.WaveParams{type}(
+      1.0,          # amplitude
+      2*pi*5,       # freq angular
+      step          # step
     )
 
-    # Uses the IVP_solver from IVPUtils to solve the initial value problem.
-    t_euler, y_euler = IVPutils.IVP_solver(euler_params)
-    t_rk4, y_rk4 = IVPutils.IVP_solver(rk4_params)
+    rlc_params = RLCUtils.RLCParams{type}(
+      1.0,      # R
+      1.0,      # L
+      1.0,      # C
+      wave_params
+    )
 
-    # Prints the results for each method.
-    println("Table of solutions:")
-    print("----------------------------------------------------------\n")
-    print("|t\t\t\t|y(euler)\t\t|y(rk4)\n")
-    print("----------------------------------------------------------\n")
+    rk4_params = IVPutils.IVPSolverSystemParams{type}(
+      RLCUtils.rlc_ode_x2_f,            # f
+      0.0,                              # t0
+      10.0,                             # tf
+      0.0,                              # x1_0
+      0.0,                              # x2_0
+      step,                             # h
+      type,                             # type
+      IVPutils.rk4_system_of_2_odes     # method
+    )
 
-    for (i, val) in enumerate(t_euler)
-      @printf("|%.6f\t\t|%.6f\t\t|%.6f\n", t_euler[i], y_euler[i], y_rk4[i])
-    end
+    t, x1, x2 = IVPutils.IVP_solver_2ode_system(rk4_params, rlc_params)
+    plot!(t, x1, title="Comportamento da corrente", label="x1(t)", linewidth=3, show=true)
+    savefig("corrente.png")
 
   end
 
