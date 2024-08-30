@@ -11,8 +11,7 @@ Authors:
 - Breno H. Pelegrin da S. <breno.pelegrin@usp.br>
 """
 module IVPutils
-
-  export FunctionParams, MethodParams, IVPSolverParams, rk4_method, IVP_solver
+  export FunctionParams, MethodParams, IVPSolverParams, IVPSystemSolverParams, IVP_solver, IVP_RLC_solver, rk4_system_of_2_odes, rk4_method, euler_method
 
   """
     MethodParams{FloatType}
@@ -74,29 +73,6 @@ module IVPutils
     yn1::params.type = params.yn + (params.h/6) * (k1 + 2*k2 + 2*k3 + k4)
     return yn1
   end
-
-  struct MethodSystemParams{FloatType}
-    f::Function
-    tn::FloatType
-    x1n::FloatType
-    x2n::FloatType
-    h::FloatType
-    type::DataType
-  end
-
-  function rk4_system_of_2_odes(params::MethodSystemParams, rlc_params)
-    # Compute RK4 coefficients
-    k1 = params.h * params.f(params.tn, params.x1n, params.x2n, rlc_params)
-    k2 = params.h * params.f(params.tn + 0.5 * params.h, params.x1n + 0.5 * k1[1], params.x2n + 0.5 * k1[2], rlc_params)
-    k3 = params.h * params.f(params.tn + 0.5 * params.h, params.x1n + 0.5 * k2[1], params.x2n + 0.5 * k2[2], rlc_params)
-    k4 = params.h * params.f(params.tn + params.h, params.x1n + k3[1], params.x2n + k3[2], rlc_params)
-    
-    # Update x1 and x2
-    x1_new = params.x1n + (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]) / 6
-    x2_new = params.x2n + (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2]) / 6
-    
-    return x1_new, x2_new
-  end
   
   function euler_method(params::MethodParams)
     yn1::params.type = params.yn + params.h * params.f(params.tn, params.yn)
@@ -157,8 +133,25 @@ module IVPutils
 
   end
 
-  struct IVPSolverSystemParams{FloatType}
-    f::Function
+  """
+    struct IVPSystemSolverParams{FloatType}
+  
+  Defines the parameters of an IVP system solver.
+
+  # Parameters
+  - f1 (Function): the function f1(t,x1,x2)
+  - f2 (Function): the function f2(t,x1,x2)
+  - t0 (FloatType): time in which x1(t0) = x1_0 and x2(t0) = x2_0
+  - tf (FloatType): final time (time to stop)
+  - x1_0 (FloatType): initial condition for x1
+  - x2_0 (FloatType): initial condition for x2
+  - h (FloatType): step size
+  - type (DataType): type of the float to be used
+  - method (Function): the method to be used
+  """
+  struct IVPSystemSolverParams{FloatType}
+    f1::Function
+    f2::Function
     t0::FloatType
     tf::FloatType
     x1_0::FloatType
@@ -169,40 +162,121 @@ module IVPutils
   end
 
   """
-    IVP_solver_2ode_system(ivp_params)
+    struct SystemMethodParams{FloatType}
+  
+  Defines the parameters received by a numerical method step.
+
+  # Parameters
+  - f1 (Function): the function f1(t,x1,x2)
+  - f2 (Function): the function f2(t,x1,x2)
+  - tn (FloatType): previous time value
+  - x1n (FloatType): previous x1 value
+  - x2n (FloatType): previous x2 value
+  - h (FloatType): step size
+  - type (DataType): type of the float to be used
   """
-  function IVP_solver_2ode_system(ivp_params::IVPSolverSystemParams, rlc_params)
-    # Generates the time array from t0 to tf, with step h
-    t = range(ivp_params.t0, ivp_params.tf, step=ivp_params.h)
-    # Generates an empty array with same size of t for storing the y values
-    x1 = zeros(length(t))
-    x2 = zeros(length(t))
-
-    # Sets up y(i=1) = y0
-    x1[1] = ivp_params.x1_0
-    x2[1] = ivp_params.x2_0
-
-    # For each time step in t, computes the numeric method for the i+1 step.
-    for i in 2:length(t)
-      method_params = MethodSystemParams{ivp_params.type}(
-        ivp_params.f, 
-        t[i],
-        x1[i],
-        x2[i],
-        ivp_params.h,
-        ivp_params.type
-      )
-      # y_(i+1) = method(params in step n)
-      a::ivp_params.type = 0.0
-      b::ivp_params.type = 0.0
-      a, b = ivp_params.method(method_params, rlc_params)
-      x1[i] = a
-      x2[i] = b
-    end 
-
-    # Returns the filled t and x1, x2 arrays
-    return t, x1, x2
-
+  struct SystemMethodParams{FloatType}
+    f1::Function
+    f2::Function
+    tn::FloatType
+    x1n::FloatType
+    x2n::FloatType
+    h::FloatType
+    type::DataType
   end
 
-end;
+  """
+    rk4_system_of_2_odes(params::SystemMethodParams)
+  
+  Computes the RK4 solution for an IVP system of 2 ODEs:
+  - dx1/dt = f1(t,x1,x2)
+  - dx2/dt = f2(t,x1,x2)
+
+  Returns:
+  - x1 for the next step
+  - x2 for the next step
+  """
+  function rk4_system_of_2_odes(params::SystemMethodParams, other_params)
+    dx1_dt = params.f1
+    dx2_dt = params.f2
+    x1 = params.x1n
+    x2 = params.x2n
+    t = params.tn
+    h = params.h
+
+    k1 = h*dx1_dt(t, x1, x2, other_params)
+    h1 = h*dx2_dt(t, x1, x2, other_params)
+
+    k2 = h*dx1_dt(t+h/2, x1+k1/2, x2+h1/2, other_params)
+    h2 = h*dx2_dt(t+h/2, x1+k1/2, x2+h1/2, other_params)
+    k3 = h*dx1_dt(t+h/2, x1+k2/2, x2+h2/2, other_params)
+    h3 = h*dx2_dt(t+h/2, x1+k2/2, x2+h2/2, other_params)
+
+    k4 = h*dx1_dt(t+h, x1+k3, x2+h3, other_params)
+    h4 = h*dx2_dt(t+h, x1+k3, x2+h3, other_params)
+
+    x1 = x1 + (k1+2*k2+2*k3+k4)/6.0
+    x2 = x2 + (h1+2*h2+2*h3+h4)/6.0
+
+    return x1, x2
+  end
+
+  """
+    IVP_RLC_solver(ivp_params::IVPSystemSolverParams, rlc_params, source_wave)
+
+  This function computes the solution of the RLC circuit
+  using the IVPSystemSolverParams and RLCParams structs.
+
+  The source_wave param is used to generate the source signal in time.
+
+  This solver uses the RK4 method to solve an IVP system of 2 ODEs:
+  - dx1/dt = x2(t)
+  - dx2/dt = 1/L (E - Rx2 - x1/C)
+
+  Returns:
+    - time array
+    - x1 array
+    - x2 array
+    - source array with the source_wave computed at each time
+  """
+  function IVP_RLC_solver(ivp_params::IVPSystemSolverParams, rlc_params, source_wave)
+      # Initialize values and arrays
+      x1::Float64 = ivp_params.x1_0
+      x2::Float64 = ivp_params.x2_0
+      t::Float64 = ivp_params.t0
+      source::Float64 = source_wave(rlc_params.wave_params, t)
+
+      x1_arr = [x1]
+      x2_arr = [x2]
+      t_arr = [t]
+      source_arr = [source]
+      tf = ivp_params.tf
+      h = ivp_params.h
+
+      # Loops until it reaches the final time
+      while t <= tf
+        method_params = SystemMethodParams{ivp_params.type}(
+          ivp_params.f1,
+          ivp_params.f2,
+          t,
+          x1,
+          x2,
+          ivp_params.h,
+          ivp_params.type
+        )
+        x1, x2 = rk4_system_of_2_odes(method_params, rlc_params)
+        source = source_wave(rlc_params.wave_params, t)
+        # Give a step of size h
+        t = t + h
+        
+        # Populate arrays
+        push!(t_arr, t)
+        push!(x1_arr, x1)
+        push!(x2_arr, x2)
+        push!(source_arr, source)
+      end
+
+      return t_arr, x1_arr, x2_arr, source_arr
+  end
+
+end

@@ -16,59 +16,44 @@ Authors:
 """
 module RLCUtils
 
-  struct InstantWaveInfo{FloatType}
-    wave::FloatType
-    derivative::FloatType
+  export square_wave, WaveParams, RLCParams, dx1_dt, dx2_dt
+
+  struct InstantWaveInfo
+    wave::Float64
+    derivative::Float64
   end
 
-  struct WaveParams{FloatType}
-    amplitude::FloatType
-    angular_frequency::FloatType
-    step_size::FloatType
+  struct WaveParams
+    amplitude::Float64
+    angular_frequency::Float64
+    step_size::Float64
   end
 
-  struct RLCParams{FloatType}
-    R::FloatType
-    L::FloatType
-    C::FloatType
+  struct RLCParams
+    R::Float64
+    L::Float64
+    C::Float64
     wave_params::WaveParams
   end
 
   function square_wave_derivative(wave_params::WaveParams, t)
-    if mod(t, (1 / wave_params.angular_frequency)) < (wave_params.step_size / 2)
-        return 1e+3
+    if t % (1 / wave_params.angular_frequency) < (wave_params.step_size / 2)
+      return 1e+4
     else
-        return 0
+      return 0
     end
   end
 
   function square_wave(wave_params::WaveParams, t)
-    info = InstantWaveInfo{Float64}(
-      wave_params.amplitude * sign(sin(wave_params.angular_frequency * t)),
-      square_wave_derivative(wave_params, t)
-    )
-    return info
+    return wave_params.amplitude * sign(sin(wave_params.angular_frequency * t))
   end
 
-  """
-    rlc_ode_x2_f(t, x1, x2, rlc_params::RLCParams)
+  function dx1_dt(t, x1, x2, rlc_params::RLCParams)
+    return x2
+  end
 
-  Function that defines the following system of 2 ODEs for RK4:
-  - x2' = rlc_ode_x2(t,x1,x2)
-  - x1' = x2
-
-  # Parameters
-  - t (number): time
-  - x1
-  - x2
-  - rlc_params (RLCParams): parameters of the RLC circuit
-
-  # Returns
-  - tuple (x2, x1)
-  """
-  function rlc_ode_x2_f(t, x1, x2, rlc_params::RLCParams)
-    wave_info = square_wave(rlc_params.wave_params, t)
-    return [x2, (wave_info.derivative - rlc_params.R * x2 - x1 / rlc_params.C) / rlc_params.L]
+  function dx2_dt(t, x1, x2, rlc_params::RLCParams)
+    return (1.0/rlc_params.L) * (square_wave(rlc_params.wave_params, t) - rlc_params.R*x2 - (x1/rlc_params.C))
   end
 
 end

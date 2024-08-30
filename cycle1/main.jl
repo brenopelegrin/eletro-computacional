@@ -16,46 +16,57 @@ Authors:
 - Breno H. Pelegrin da S. <breno.pelegrin@usp.br>
 """
 module cycle1
-  include("./ivputils.jl")
+  # Imports necessary modules
   include("./rlcutils.jl")
+  include("./ivputils.jl")
   using Printf
   using Plots
   import .IVPutils
   import .RLCUtils
 
   function main()
-
     # Defines the float type to use as Float64, for better precision
     type = Float64
-    step::type = 1e-4
-
-    wave_params = RLCUtils.WaveParams{type}(
-      1.0,          # amplitude
-      2*pi*5,       # freq angular
-      step          # step
+    step::type = 1e-5 # (s)
+    
+    # Declares parameters for the simulation
+    wave_params = RLCUtils.WaveParams(
+      20,           # amplitude (V)
+      25,           # angular freq (rad/s)
+      step          # step (s)
     )
 
-    rlc_params = RLCUtils.RLCParams{type}(
-      1.0,      # R
-      1.0,      # L
-      1.0,      # C
+    rlc_params = RLCUtils.RLCParams(
+      3,            # R = 3 Ohm
+      50e-3,        # L = 50mH
+      5e-4,         # C = 500 uF
       wave_params
     )
 
-    rk4_params = IVPutils.IVPSolverSystemParams{type}(
-      RLCUtils.rlc_ode_x2_f,            # f
-      0.0,                              # t0
-      10.0,                             # tf
+    rk4_params = IVPutils.IVPSystemSolverParams(
+      RLCUtils.dx1_dt,                  # func1
+      RLCUtils.dx2_dt,                  # func2
+      0.0,                              # t0 (s)
+      1.0,                              # tf (s)
       0.0,                              # x1_0
       0.0,                              # x2_0
-      step,                             # h
+      step,                             # h (s)
       type,                             # type
       IVPutils.rk4_system_of_2_odes     # method
     )
 
-    t, x1, x2 = IVPutils.IVP_solver_2ode_system(rk4_params, rlc_params)
-    plot!(t, x1, title="Comportamento da corrente", label="x1(t)", linewidth=3, show=true)
-    savefig("corrente.png")
+    # Computes the RK4 solution for the problem using RLCUtils functions and IVPUtils methods.
+    source_wave = RLCUtils.square_wave
+    t_arr, x1_arr, x2_arr, source_arr = IVPutils.IVP_RLC_solver(rk4_params, rlc_params, source_wave)
+    
+    print(length(t_arr), length(x1_arr), length(x2_arr))
+
+    Plots.plot(t_arr, x1_arr, title="Comportamento de Q(t)", label="x1(t)", linewidth=1)
+    Plots.savefig("x1.png")
+    Plots.plot(t_arr, [x2_arr, source_arr*0.25], title="Comportamento de I(t)", label=["x2(t)" "V0(t) 0.25x"], linewidth=1)
+    Plots.savefig("x2.png")
+    Plots.plot(t_arr, source_arr, title="Comportamento de V(t)", label="V(t)", linewidth=1)
+    Plots.savefig("source.png")
 
   end
 
