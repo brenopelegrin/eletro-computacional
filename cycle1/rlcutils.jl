@@ -52,7 +52,7 @@ module RLCUtils
   end
 
   function dx2_dt(t, x1, x2, rlc_params::RLCParams)
-    return square_wave(rlc_params.wave_params, t) - rlc_params.gamma*x2 - rlc_params.w0*x1
+    return square_wave(rlc_params.wave_params, t) - rlc_params.gamma*x2 - (rlc_params.w0^2)*x1
   end
 
 end

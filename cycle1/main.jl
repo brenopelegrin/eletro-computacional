@@ -39,7 +39,7 @@ module cycle1
 
     rlc_params = RLCUtils.RLCParams(
       200,          # w0 = 200 (rad/s)
-      60,           # gamma = 60 (Np/s)
+      60,           # gamma = 60 (Np/s) 
       wave_params
     )
 
@@ -62,9 +62,10 @@ module cycle1
     
     print(length(t_arr), length(x1_arr), length(x2_arr))
 
-    Plots.plot(t_arr, x1_arr, title="Comportamento de Q(t)", label=L"\frac{Q(t)}{L}", linewidth=1)
+    #inductance is 0.005 mH
+    Plots.plot(t_arr, x1_arr/0.05, title="Comportamento de Q(t)", label="Q(t)", linewidth=1)
     Plots.savefig("x1.png")
-    Plots.plot(t_arr, [x2_arr, source_arr/wave_amplitude], title="Comportamento de I(t)", label=[L"\frac{I(t)}{L}" L"\frac{V(t)}{V_{0}}"], linewidth=1)
+    Plots.plot(t_arr, [x2_arr/0.05, source_arr/wave_amplitude], title="Comportamento de I(t)", label=["I(t)" L"\frac{V(t)}{V_{0}}"], linewidth=1)
     Plots.savefig("x2.png")
     Plots.plot(t_arr, source_arr/wave_amplitude, title="Comportamento de V(t)", label=L"\frac{V(t)}{V_{0}}", linewidth=1)
     Plots.savefig("source.png")
