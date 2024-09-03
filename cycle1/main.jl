@@ -21,6 +21,7 @@ module cycle1
   include("./ivputils.jl")
   using Printf
   using Plots
+  using LaTeXStrings
   import .IVPutils
   import .RLCUtils
 
@@ -57,15 +58,16 @@ module cycle1
 
     # Computes the RK4 solution for the problem using RLCUtils functions and IVPUtils methods.
     source_wave = RLCUtils.square_wave
+    wave_amplitude = wave_params.amplitude
     t_arr, x1_arr, x2_arr, source_arr = IVPutils.IVP_RLC_solver(rk4_params, rlc_params, source_wave)
     
     print(length(t_arr), length(x1_arr), length(x2_arr))
 
-    Plots.plot(t_arr, x1_arr, title="Comportamento de Q(t)", label="x1(t)", linewidth=1)
+    Plots.plot(t_arr, x1_arr, title="Comportamento de Q(t)", label=L"x_{1}(t)", linewidth=1)
     Plots.savefig("x1.png")
-    Plots.plot(t_arr, [x2_arr, source_arr*0.25], title="Comportamento de I(t)", label=["x2(t)" "V0(t) 0.25x"], linewidth=1)
+    Plots.plot(t_arr, [x2_arr, source_arr/wave_amplitude], title="Comportamento de I(t)", label=[L"x_{2}(t)" L"V(t)/V_{0}"], linewidth=1)
     Plots.savefig("x2.png")
-    Plots.plot(t_arr, source_arr, title="Comportamento de V(t)", label="V(t)", linewidth=1)
+    Plots.plot(t_arr, source_arr/wave_amplitude, title="Comportamento de V(t)", label=L"V(t)/V_{0}", linewidth=1)
     Plots.savefig("source.png")
 
   end
