@@ -62,11 +62,11 @@ module cycle1
     
     print(length(t_arr), length(x1_arr), length(x2_arr))
 
-    Plots.plot(t_arr, x1_arr, title="Comportamento de Q(t)", label=L"x_{1}(t)", linewidth=1)
+    Plots.plot(t_arr, x1_arr, title="Comportamento de Q(t)", label=L"\frac{Q(t)}{L}", linewidth=1)
     Plots.savefig("x1.png")
-    Plots.plot(t_arr, [x2_arr, source_arr/wave_amplitude], title="Comportamento de I(t)", label=[L"x_{2}(t)" L"V(t)/V_{0}"], linewidth=1)
+    Plots.plot(t_arr, [x2_arr, source_arr/wave_amplitude], title="Comportamento de I(t)", label=[L"\frac{I(t)}{L}" L"\frac{V(t)}{V_{0}}"], linewidth=1)
     Plots.savefig("x2.png")
-    Plots.plot(t_arr, source_arr/wave_amplitude, title="Comportamento de V(t)", label=L"V(t)/V_{0}", linewidth=1)
+    Plots.plot(t_arr, source_arr/wave_amplitude, title="Comportamento de V(t)", label=L"\frac{V(t)}{V_{0}}", linewidth=1)
     Plots.savefig("source.png")
 
   end
