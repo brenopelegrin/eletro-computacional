@@ -38,9 +38,8 @@ module cycle1
     )
 
     rlc_params = RLCUtils.RLCParams(
-      3,            # R = 3 Ohm
-      50e-3,        # L = 50mH
-      5e-4,         # C = 500 uF
+      200,          # w0 = 200 (rad/s)
+      60,           # gamma = 60 (Np/s)
       wave_params
     )
 

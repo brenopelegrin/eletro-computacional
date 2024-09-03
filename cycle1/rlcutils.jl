@@ -30,9 +30,8 @@ module RLCUtils
   end
 
   struct RLCParams
-    R::Float64
-    L::Float64
-    C::Float64
+    w0::Float64
+    gamma::Float64
     wave_params::WaveParams
   end
 
@@ -53,7 +52,7 @@ module RLCUtils
   end
 
   function dx2_dt(t, x1, x2, rlc_params::RLCParams)
-    return (1.0/rlc_params.L) * (square_wave(rlc_params.wave_params, t) - rlc_params.R*x2 - (x1/rlc_params.C))
+    return square_wave(rlc_params.wave_params, t) - rlc_params.gamma*x2 - rlc_params.w0*x1
   end
 
 end
