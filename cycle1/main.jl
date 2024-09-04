@@ -57,17 +57,20 @@ module cycle1
 
     # Computes the RK4 solution for the problem using RLCUtils functions and IVPUtils methods.
     source_wave = RLCUtils.square_wave
-    wave_amplitude = wave_params.amplitude
     t_arr, x1_arr, x2_arr, source_arr = IVPutils.IVP_RLC_solver(rk4_params, rlc_params, source_wave)
+
+    # Computes the amplitudes of the interessing values
+    wave_amp = wave_params.amplitude
+    x1_amp = maximum(x1_arr)
+    x2_amp = maximum(x2_arr)
     
     print(length(t_arr), length(x1_arr), length(x2_arr))
 
-    #inductance is 0.005 mH
-    Plots.plot(t_arr, x1_arr/0.05, title="Comportamento de Q(t)", label="Q(t)", linewidth=1)
+    Plots.plot(t_arr, x1_arr/x1_amp, title="Comportamento de Q(t)", label=L"\frac{Q(t)}{Q_{0}}", linewidth=1)
     Plots.savefig("x1.png")
-    Plots.plot(t_arr, [x2_arr/0.05, source_arr/wave_amplitude], title="Comportamento de I(t)", label=["I(t)" L"\frac{V(t)}{V_{0}}"], linewidth=1)
+    Plots.plot(t_arr, [x2_arr/x2_amp, source_arr/wave_amp], title="Comportamento de I(t)", label=[L"\frac{I(t)}{I_{0}}" L"\frac{V(t)}{V_{0}}"], linewidth=1)
     Plots.savefig("x2.png")
-    Plots.plot(t_arr, source_arr/wave_amplitude, title="Comportamento de V(t)", label=L"\frac{V(t)}{V_{0}}", linewidth=1)
+    Plots.plot(t_arr, source_arr/wave_amp, title="Comportamento de V(t)", label=L"\frac{V(t)}{V_{0}}", linewidth=1)
     Plots.savefig("source.png")
 
   end
