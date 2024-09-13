@@ -33,13 +33,13 @@ module cycle1
     # Declares parameters for the simulation
     wave_params = RLCUtils.WaveParams(
       20,           # amplitude (V)
-      5,           # angular freq (rad/s)
+      10,           # angular freq (rad/s)
       step          # step (s)
     )
 
     rlc_params = RLCUtils.RLCParams(
-      20,          # w0 = 200 (rad/s)
-      30,           # gamma = 60 (Np/s) 
+      10,          # w0 = 200 (rad/s)
+      60,           # gamma = 60 (Np/s) 
       wave_params
     )
 
@@ -69,12 +69,14 @@ module cycle1
     
     #print(length(t_arr), length(x1_arr), length(x2_arr))
 
-    Plots.plot(t_arr/t_char, x1_arr/x1_amp, title=L"Comportamento de Q(\frac{t}{\tau})", label=L"\frac{Q(\frac{t}{\tau})}{Q_{max}}", linewidth=1)
-    Plots.savefig("x1.png")
-    Plots.plot(t_arr/t_char, [x2_arr/x2_amp, source_arr/wave_amp], title=L"Comportamento de I(\frac{t}{\tau})", label=[L"\frac{I(\frac{t}{\tau})}{I_{max}}" L"\frac{V(\frac{t}{\tau})}{V_{0}}"], linewidth=1)
-    Plots.savefig("x2.png")
-    Plots.plot(t_arr/t_char, source_arr/wave_amp, title=L"Comportamento de V(\frac{t}{\tau})", label=L"\frac{V(\frac{t}{\tau})}{V_{0}}", linewidth=1)
-    Plots.savefig("source.png")
+    """Plots.plot(t_arr/t_char, [x1_arr/x1_amp, source_arr/wave_amp], title="Comportamento de Q(t)", label=[L"\frac{Q(t)}{Q_{max}}" L"\frac{V(t)}{V_{0}}"], xlabel=L"\frac{t}{\tau}",linewidth=1)
+    Plots.savefig("sup-x1.png")
+    Plots.plot(t_arr/t_char, [x2_arr/x2_amp, source_arr/wave_amp], title="Comportamento de I(t)", label=[L"\frac{I(t)}{I_{max}}" L"\frac{V(t)}{V_{0}}"], xlabel=L"\frac{t}{\tau}", linewidth=1)
+    Plots.savefig("sup-x2.png")
+    Plots.plot(t_arr/t_char, source_arr/wave_amp, title=L"Comportamento de V(t)", ylabel=L"\frac{V(t)}{V_{0}}", xlabel=L"\frac{t}{\tau}", linewidth=1)
+    Plots.savefig("sup-source.png")"""
+    Plots.plot(t_arr/t_char, [x1_arr/x1_amp, x2_arr/x2_amp, source_arr/wave_amp], title="Comportamento de Q(t) e I(t)", label=[L"\frac{Q(t)}{Q_{max}}" L"\frac{I(t)}{I_{max}}" L"\frac{V(t)}{V_{0}}"], xlabel=L"\frac{t}{\tau}", linewidth=1)
+    Plots.savefig("geral.png")
 
   end
 
