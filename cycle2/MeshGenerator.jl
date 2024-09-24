@@ -15,14 +15,15 @@ Authors:
 module MeshGenerator
     export InitializeMesh
 
-    function InitializeMesh(side::Int,list_of_points::Array{Array{Int,1},1})
+    function InitializeMesh(side::Int,list_of_points::Vector{Tuple{Int, Int}})
 
         # create the mesh
         mesh = zeros(Float64, side, side)
         
         # define the positions of the eletrical chargess
-        for i in list_of_points
-            mesh[i[1],i[2]] = 1
+        for point in list_of_points
+            x, y = point
+            mesh[x, y] = 1.0
         end
 
         # return the mesh

@@ -1,5 +1,5 @@
 """
-  MeshGenerator
+  MeshUpdater
 
 Module that update the mesh
 
@@ -13,9 +13,9 @@ Authors:
 - Pedro Calligaris Delbem <pedrodelbem@usp.br>
 """
 module MeshUpdater
-    export InitializeMesh
+    export UpdateMesh
 
-    function UpdateMesh(mesh::Array{Float64, 2},side::Int,minimum_interations::Int,list_of_points::Array{Array{Int,1},1})    
+    function UpdateMesh(mesh::Array{Float64, 2},side::Int,minimum_iterations::Int,list_of_points::Vector{Tuple{Int, Int}})    
 
         # create the mesh
         mesh = mesh
@@ -26,7 +26,7 @@ module MeshUpdater
         # update the mesh until the control factor is less than 1e-3
         while control_fator > 1e-3
 
-            for interation in 1:minimum_interations
+            for iteration in 1:minimum_iterations
 
                 # save the previous mesh
                 previous_mesh = mesh
