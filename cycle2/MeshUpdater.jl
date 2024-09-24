@@ -15,7 +15,7 @@ Authors:
 module MeshUpdater
     export InitializeMesh
 
-    function UpdateMeh(mesh::Array{Float64, 2},side::Int,minimum_interations::Int)
+    function UpdateMesh(mesh::Array{Float64, 2},side::Int,minimum_interations::Int,list_of_points::Array{Array{Int,1},1})    
 
         # create the mesh
         mesh = mesh
@@ -37,9 +37,11 @@ module MeshUpdater
 
                         # compute the intermitate value
                         r = 1/4*(mesh[i+1,j]+mesh[i-1,j]+mesh[i,j+1]+mesh[i,j-1]) - mesh[i,j]
-                        # update the value of the mesh
-                        mesh[i,j] += r
-                        
+                        # update the value of the mesh if the point is not in the list of points (the charges)
+                        if !(i in list_of_points[:,1] && j in list_of_points[:,2])
+                            mesh[i,j] += r
+                        end
+
                     end
                 end
 
