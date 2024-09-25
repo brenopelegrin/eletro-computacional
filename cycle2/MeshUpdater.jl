@@ -38,8 +38,8 @@ module MeshUpdater
                         # compute the intermitate value
                         r = 1/4*(mesh[i+1,j]+mesh[i-1,j]+mesh[i,j+1]+mesh[i,j-1]) - mesh[i,j]
                         # update the value of the mesh if the point is not in the list of points (the charges)
-                        if !(i in list_of_points[:,1] && j in list_of_points[:,2])
-                            mesh[i,j] += r
+                        if !((i,j) in list_of_points)
+                            mesh[i,j] += r*(2/(1+pi/side))
                         end
 
                     end
