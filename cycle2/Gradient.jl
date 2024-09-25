@@ -15,20 +15,36 @@ Authors:
 module Gradient
     export compute_gradient
     
-    function compute_gradient(mesh::Array{Float64, 2})
+    function compute_gradient(mesh::Matrix{Float64},side::Int)
 
         # initialize the gradient
         Ex = zeros(Float64, size(mesh))
         Ey = zeros(Float64, size(mesh))
         
-        # difines the rows and columns
-        rows, cols = size(mesh)
-        
         # compute the gradient
-        for i in 2:rows-1
-            for j in 2:cols-1
-                Ex[i, j] = (mesh[i+1, j] - mesh[i-1, j]) / 2
-                Ey[i, j] = (mesh[i, j+1] - mesh[i, j-1]) / 2
+        for i in 1:side
+            for j in 1:side
+
+                #at the ends
+                if i == 1
+                    Ex[i, j] = (mesh[i+1, j] - mesh[i, j])
+                elseif i == side
+                    Ex[i, j] = (mesh[i, j] - mesh[i-1, j])
+
+                #other points
+                else
+                    Ex[i, j] = (mesh[i+1, j] - mesh[i-1, j]) / 2
+                end
+
+                #at the ends
+                if j == 1
+                    Ey[i, j] = (mesh[i, j+1] - mesh[i, j])
+                elseif j == side
+                    Ey[i, j] = (mesh[i, j] - mesh[i, j-1])
+                #other points
+                else
+                    Ey[i, j] = (mesh[i, j+1] - mesh[i, j-1]) / 2
+                end
             end
         end
         

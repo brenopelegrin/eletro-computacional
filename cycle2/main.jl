@@ -47,27 +47,37 @@ module cycle2
                         (53, 60),(53, 61)]
 
         two_charges::Vector{Tuple{Int, Int}}  = [(3,3), (9,9)]
+
+        current_list = two_charges
         
         # create the mesh
-        mesh = MeshGenerator.InitializeMesh(side, two_charges)
+        mesh = MeshGenerator.InitializeMesh(side, current_list)
         
         # atualize the mesh
-        final_mesh = MeshUpdater.UpdateMesh(mesh, side, minimum_iterations, two_charges)
+        final_mesh = MeshUpdater.UpdateMesh(mesh, side, minimum_iterations, current_list)
 
         # compute the gradient of the potential
-        Ex, Ey = Gradient.compute_gradient(final_mesh)
+        Ex, Ey = Gradient.compute_gradient(final_mesh, side)
+        # Normalize the field vectors
+        magnitude = sqrt.(Ex.^2 .+ Ey.^2) .+ 1e-9  # Add a small number to avoid division by zero
+        Ex_norm = Ex*2 ./ magnitude
+        Ey_norm = Ey*2 ./ magnitude
+
+        plot()
+        quiver!(1:side, 1:side, quiver=(Ex_norm, Ey_norm), color=:black, label="Linhas de Campo", arrow=:true)
+        Plots.savefig("field.png")
 
         # create the plot
         plot()
 
         # defines the plot charge distribution
-        scatter!(two_charges, marker=:circle, color=:red, markersize=1)
+        scatter!(current_list, marker=:circle, color=:red, markersize=1)
 
         # defines the plot equipotencial line
         contour!(final_mesh, levels=20, color=:grays, alpha=0.5, label="Linhas Equipotenciais")
 
         # defines the field lines
-        #quiver!(1:side, 1:side, quiver=(Ex, Ey), scale=0.1, color=:black, label="Linhas de Campo")
+        quiver!(1:side, 1:side, quiver=(Ex_norm, Ey_norm), color=:black, label="Linhas de Campo", arrow=:true)
 
         # defines the plot
         title!("Distribuição de Cargas, Equipotenciais e Linhas de Campo")

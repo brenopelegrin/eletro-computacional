@@ -15,7 +15,7 @@ Authors:
 module MeshUpdater
     export UpdateMesh
 
-    function UpdateMesh(mesh::Array{Float64, 2},side::Int,minimum_iterations::Int,list_of_points::Vector{Tuple{Int, Int}})    
+    function UpdateMesh(mesh::Matrix{Float64},side::Int,minimum_iterations::Int,list_of_points::Vector{Tuple{Int, Int}})    
 
         # create the mesh
         mesh = mesh

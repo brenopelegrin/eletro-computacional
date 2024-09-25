@@ -16,8 +16,6 @@ module MeshGenerator
     export InitializeMesh
 
     # imports the necessary modules
-    #include("./V-AtThePoints.jl")
-    #using .V-AtThePoints
 
     function InitializeMesh(side::Int,list_of_points::Vector{Tuple{Int, Int}})
 
