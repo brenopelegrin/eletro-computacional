@@ -33,18 +33,19 @@ module Gradient
 
                 #other points
                 else
-                    Ex[i, j] = (mesh[i+1, j] - mesh[i-1, j]) / 2
+                    Ex[i, j] = (mesh[i+1, j] - mesh[i-1, j])/2
                 end
 
                 #at the ends
                 if j == 1
-                    Ey[i, j] = (mesh[i, j+1] - mesh[i, j])
+                    Ey[i, j] = (mesh[i, j+1] - mesh[i, j])/2
                 elseif j == side
-                    Ey[i, j] = (mesh[i, j] - mesh[i, j-1])
+                    Ey[i, j] = (mesh[i, j] - mesh[i, j-1])/2
                 #other points
                 else
                     Ey[i, j] = (mesh[i, j+1] - mesh[i, j-1]) / 2
                 end
+                
             end
         end
         
