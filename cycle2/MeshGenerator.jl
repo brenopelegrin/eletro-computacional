@@ -26,7 +26,7 @@ module MeshGenerator
         for i in 1:side
             for j in 1:side
                 if (i,j) in list_of_points
-                    mesh[i, j] = 9e9
+                    mesh[i, j] = 1.5e2
                 end
             end
         end

@@ -31,14 +31,14 @@ module PlotAll
                 contour!(final_mesh, levels=20, color=:blue, alpha=0.5)
 
                 # Normalize the field vectors
-                magnitude = sqrt.(Ex.^2 .+ Ey.^2) .+ 1e-9  # Add a small number to avoid division by zero
+"""                magnitude = sqrt.(Ex.^2 .+ Ey.^2) .+ 1e-9  # Add a small number to avoid division by zero
                 Ex_norm = Ex ./ magnitude
-                Ey_norm = Ey ./ magnitude
+                Ey_norm = Ey ./ magnitude"""
         
                 # defines the field lines
                 # for each point in the mesh
-                for i in 1:10:side
-                  for j in 1:10:side
+                for i in 1:7:side
+                  for j in 1:7:side
         
                       # if the point is not in the list of points
                       if !((i,j) in current_list)
@@ -47,8 +47,8 @@ module PlotAll
                         x = i
                         y = j
                         # final point of the vector
-                        dx = Ex_norm[i,j]*4
-                        dy = Ey_norm[i,j]*4
+                        dx = Ex[i,j]
+                        dy = Ey[i,j]
                         
                         # plot a line from initial point to initial point + vector(field)
                         plot!([x, x + dx], [y, y + dy], lw=2, arrow=:arrow, arrowsize=0.25, color=:grey, legend=false)
