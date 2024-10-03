@@ -58,7 +58,7 @@ module PlotAll
                 
         plot!()
         # saves the plot
-        Plots.savefig("plot.png")
+        Plots.savefig("ampere.png")
         
     end
 end
