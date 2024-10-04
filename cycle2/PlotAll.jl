@@ -21,24 +21,21 @@ module PlotAll
 
     function CreatePlot(final_mesh::Matrix{Float64}, side::Int, current_list::Vector{Tuple{Int, Int}}, Ex::Matrix{Float64}, Ey::Matrix{Float64})
 
-                # create the plot
-                plot(title="Charge, Equipotentials and Field ")
+                # inversione the list of points
+                for i in 1:length(current_list)
+                  current_list[i] = (current_list[i][2], current_list[i][1])
+                end
 
                 # defines the plot charge distribution
-                scatter!(current_list, marker=:circle, color=:red, markersize=5)
+                scatter!(current_list, marker=:circle, color=:red, markersize=2, legend=false)
 
                 # defines the plot equipotencial line
-                contour!(final_mesh, levels=20, color=:blue, alpha=0.5)
-
-                # Normalize the field vectors
-"""                magnitude = sqrt.(Ex.^2 .+ Ey.^2) .+ 1e-9  # Add a small number to avoid division by zero
-                Ex_norm = Ex ./ magnitude
-                Ey_norm = Ey ./ magnitude"""
+                contour!(final_mesh, levels=20, color=:green, alpha=0.5)
         
                 # defines the field lines
                 # for each point in the mesh
-                for i in 1:7:side
-                  for j in 1:7:side
+                for i in 1:18:side
+                  for j in 1:18:side
         
                       # if the point is not in the list of points
                       if !((i,j) in current_list)
@@ -51,14 +48,15 @@ module PlotAll
                         dy = Ey[i,j]
                         
                         # plot a line from initial point to initial point + vector(field)
-                        plot!([x, x + dx], [y, y + dy], lw=2, arrow=:arrow, arrowsize=0.25, color=:grey, legend=false)
+                        plot!([y, y + dy], [x, x + dx], lw=2, arrow=:arrow, arrowsize=0.25, color=:blue, legend=false)
                       end
                   end
                 end
                 
         plot!()
+
         # saves the plot
-        Plots.savefig("ampere.png")
+        Plots.savefig("gaussB.png")
         
     end
 end

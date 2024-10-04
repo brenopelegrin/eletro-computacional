@@ -21,6 +21,11 @@ module MeshGenerator
 
         # create the mesh
         mesh = zeros(Float64, side, side)
+
+        # inversione the list of points
+        for i in 1:length(list_of_points)
+            list_of_points[i] = (list_of_points[i][1], list_of_points[i][2]+125)
+        end
         
         # define the positions of the eletrical chargess
         for i in 1:side
